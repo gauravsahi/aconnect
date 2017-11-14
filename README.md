@@ -33,6 +33,7 @@ aws lambda add-permission --function-name function:<my-lambda-function> \
 --source-account <account ID>
 
 Request
+Note down the ARN of Lambda function deployed by CloudFormation and use the same while invoking it from Amazon Connect
 When you invoke a Lambda function, the set of parameters passed can be seen in the model definition. The sample JSON request event is available on 
 page#14 of the Amazon Connect Administration Guide. The request is divided into three parts:
 • Contact data—This is always passed by Amazon Connect for every contact. Some parameters are optional.
@@ -44,10 +45,11 @@ Response
 The Lambda function response should be a simple Map string string. This map can be up to 32k. 
 
 Dynamo DB
-On the Dynamo DB Web Console, please add a row with Called Number as unique key to enter the customer details which will be retrieved during the contact flow.
+In this example, CloudFormation will deploy a DynamoDB table with name 'ConnectCC' with unique primary attribute key name 'CalledNumber'.
+Through the Dynamo DB Web Console or AWS CLI, please add a row with Called Number as unique key to enter the customer details which will be retrieved during the contact flow.
 Attribute Keys: CalledNumber, FirstName, LastName and LastCallDate [Minimum set]
-
-Kindly take note of the Attribute Key Names and the case used with no blanks.
+Attribute Key Values (example): 101, Jack, Ryan, 11-Nov-17
+Kindly take note of the Attribute Key Names and the case used with no blanks while using the DynamoDB PUT API.
 
 AWS Serverless Application Model (AWS SAM)
 The service allows you to easily create and manage resources used in your serverless application using AWS CloudFormation.
