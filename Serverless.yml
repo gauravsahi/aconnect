@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Parameters:
+  Connectarn:
+    Type: String
+    Description: ARN of the Amazon Connect instance that will trigger Lambda Function
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "Amazon Connect Configuration"
+        Parameters:
+            - Connectarn
+    ParameterLabels:
+      Connectarn:
+        default: "Amazon Connect Intance ARN"
+
+Resources:
+  myDynamoDBTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: CalledNumber
+          AttributeType: S
+      KeySchema:
+        - AttributeName: CalledNumber
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: AConnect-CC
+
+  HelloWorld:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: 's3://store4lambdafunction/lambda_code.zip'
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref 'myDynamoDBTable'
+
+  LambdaInvokePermission:
+    Type: 'AWS::Lambda::Permission'
+    DependsOn: 'HelloWorld'
+    Properties:
+      FunctionName: !Ref 'HelloWorld'
+      Action: 'lambda:InvokeFunction'
+      Principal: connect.amazonaws.com
+      SourceAccount: !Ref 'AWS::AccountId'
+      SourceArn: !Ref 'Connectarn'
+
+  InitFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: 's3://store4lambdafunction/populatelambda.zip'
+      Timeout: 30
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref 'myDynamoDBTable'
+
+  InitializeDynamoDB:
+    Type: Custom::InitFunction
+    DependsOn: myDynamoDBTable
+    Version: "1.0"
+    Properties:
+      ServiceToken:
+        !GetAtt 'InitFunction.Arn'
+      DynamoTableName:
+        !Ref 'myDynamoDBTable'
+
+Outputs:
+  LambdaFnARN:
+    Description: ARN of the Lambda Function created using CloudFormation Template
+    Value: !GetAtt 'HelloWorld.Arn'
