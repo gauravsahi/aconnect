@@ -1,7 +1,7 @@
-Welcome to the Serverless Application Model
+Welcome to Amazon Connect with Serverless Hook
 ==============================================
 
-This sample code helps get you started with a simple web service integration hook deployed by AWS CloudFormation to AWS Lambda and Amazon Dynamo DB.
+The sample code helps get you started with a simple web service integration hook deployed by AWS CloudFormation between Amazon Connect and AWS Lambda with Dynamo DB.
 
 The Amazon Connect integration with Lambda is useful to execute a business logic during the contact flow to help interact with other AWS services or data sources.
 In this example, lambda integration is used to fetch the customer details from a data source like Dynamo DB based on the contact number used to make a call to the 
@@ -14,7 +14,20 @@ Interaction model:
 - Contact Flow can either use the retrieved information within the flow or save it to Contact Trace Record using ‘Set Contact Attributes’ action block
 
 Pre-requisites:
+- AWS Account
 - Amazon Connect Instance with a contact flow which uses ‘Invoke AWS Lambda Function’ action block
+- AWS CLI if you prefer to deploy the package using command line with IAM permissions for Role creation, attachment and deletion for the user
+
+How to deploy:
+- Clone the Github repository to a chosen target folder on your local PC or Mac
+- Execute the following command on command prompt / terminal after navigating to the target folder
+    aws cloudformation deploy \
+    --template-file serverless-output.yaml \
+    --stack-name <enter-stack-name> \
+    --capabilities CAPABILITY_IAM \
+    --parameter-overrides Connectarn=<amazon-connect-instance-arn>
+ OR
+- Open AWS Web Console for Cloud Formation, click on Create Stack and select the Serverless.yml, enter stack name and provide Amazon Connect Instance ARN to deploy the package
 
 Lambda Functions
 In this example, Cloud Formation template creates a stack with 2 lambda functions
