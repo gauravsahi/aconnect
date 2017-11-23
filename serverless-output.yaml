@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: Amazon Connect Configuration
+      Parameters:
+      - Connectarn
+    ParameterLabels:
+      Connectarn:
+        default: Amazon Connect Intance ARN
+Outputs:
+  LambdaFnARN:
+    Description: ARN of the Lambda Function created using CloudFormation Template
+    Value:
+      Fn::GetAtt:
+      - HelloWorld
+      - Arn
+Parameters:
+  Connectarn:
+    Description: ARN of the Amazon Connect instance that will trigger Lambda Function
+    Type: String
+Resources:
+  HelloWorld:
+    Properties:
+      CodeUri: s3://store4lambdafunction/lambda_code.zip
+      Handler: index.handler
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName:
+            Ref: myDynamoDBTable
+      Runtime: nodejs6.10
+    Type: AWS::Serverless::Function
+  InitFunction:
+    Properties:
+      CodeUri: s3://store4lambdafunction/populatelambda.zip
+      Handler: index.handler
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: myDynamoDBTable
+      Runtime: nodejs6.10
+      Timeout: 30
+    Type: AWS::Serverless::Function
+  InitializeDynamoDB:
+    DependsOn: myDynamoDBTable
+    Properties:
+      DynamoTableName:
+        Ref: myDynamoDBTable
+      ServiceToken:
+        Fn::GetAtt:
+        - InitFunction
+        - Arn
+    Type: Custom::InitFunction
+    Version: '1.0'
+  LambdaInvokePermission:
+    DependsOn: HelloWorld
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Ref: HelloWorld
+      Principal: connect.amazonaws.com
+      SourceAccount:
+        Ref: AWS::AccountId
+      SourceArn:
+        Ref: Connectarn
+    Type: AWS::Lambda::Permission
+  myDynamoDBTable:
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: CalledNumber
+        AttributeType: S
+      KeySchema:
+      - AttributeName: CalledNumber
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: AConnect-CC
+    Type: AWS::DynamoDB::Table
+Transform:
+- AWS::Serverless-2016-10-31
