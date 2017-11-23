@@ -25,7 +25,7 @@ How to deploy:
   OR
 - Open AWS Web Console for Cloud Formation, click on Create Stack and select the Serverless.yml, enter stack name and provide Amazon Connect Instance ARN to deploy the package
 
-Lambda Functions \n
+Lambda Functions
 In this example, Cloud Formation template creates a stack with 2 lambda functions
 - HelloWorld with naming schema like ‘<stack>-HelloWorld-<random Alpha key>’ is the main function which does data dip and returns key value pairs to Amazon Connect
 - InitFunction with naming schema like ‘<stack>-InitFunction-<random Alpha key>’ is only a initialisation function to pre-populate the Dynamo DB table
