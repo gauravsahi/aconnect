@@ -21,12 +21,12 @@ Pre-requisites:
 How to deploy:
 - Clone the Github repository to a chosen target folder on your local PC or Mac
 - Execute the following command on command prompt / terminal after navigating to the target folder
-    aws cloudformation deploy \
-    --template-file serverless-output.yaml \
-    --stack-name <enter-stack-name> \
-    --capabilities CAPABILITY_IAM \
-    --parameter-overrides Connectarn=<amazon-connect-instance-arn>
- OR
+    aws cloudformation deploy \\
+    --template-file serverless-output.yaml \\
+    --stack-name \<enter-stack-name\> \\
+    --capabilities CAPABILITY_IAM \\
+    --parameter-overrides Connectarn\=\<amazon-connect-instance-arn\>
+OR
 - Open AWS Web Console for Cloud Formation, click on Create Stack and select the Serverless.yml, enter stack name and provide Amazon Connect Instance ARN to deploy the package
 
 Lambda Functions
