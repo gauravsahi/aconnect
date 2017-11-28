@@ -28,7 +28,7 @@ exports.handler = function(event, context) {
             CalledNumber: {"S" : "101"},
             FirstName: {"S" : "James"},
             LastName: {"S" : "Bond"},
-            LastCallDate: {"S" : datetime}
+            LastCallDate: {"S" : "20-Nov-2017"}
        }
     }, function(err, data) {
         if (err) {
