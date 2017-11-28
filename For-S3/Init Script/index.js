@@ -18,9 +18,10 @@ exports.handler = function(event, context) {
     var responseStatus = "FAILED";
 
     var tableName = event.ResourceProperties.DynamoTableName;
-    var datetime = new Date().getTime().toString();
+    var datetime = new Date().toDateString();
 
     console.log("Table name received in event:" +tableName);
+    console.log("Date" +datetime);
 
     dynamodb.putItem({
         "TableName": tableName,
@@ -28,7 +29,7 @@ exports.handler = function(event, context) {
             CalledNumber: {"S" : "101"},
             FirstName: {"S" : "James"},
             LastName: {"S" : "Bond"},
-            LastCallDate: {"S" : "20-Nov-2017"}
+            LastCallDate: {"S" : datetime}
        }
     }, function(err, data) {
         if (err) {
