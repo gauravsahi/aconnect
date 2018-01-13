@@ -42,17 +42,6 @@ Resources:
       Runtime: nodejs6.10
       Timeout: 30
     Type: AWS::Serverless::Function
-  InitializeDynamoDB:
-    DependsOn: myDynamoDBTable
-    Properties:
-      DynamoTableName:
-        Ref: myDynamoDBTable
-      ServiceToken:
-        Fn::GetAtt:
-        - InitFunction
-        - Arn
-    Type: Custom::InitFunction
-    Version: '1.0'
   myDynamoDBTable:
     Properties:
       AttributeDefinitions:
