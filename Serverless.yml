@@ -56,16 +56,6 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref 'myDynamoDBTable'
 
-  InitializeDynamoDB:
-    Type: Custom::InitFunction
-    DependsOn: myDynamoDBTable
-    Version: "1.0"
-    Properties:
-      ServiceToken:
-        !GetAtt 'InitFunction.Arn'
-      DynamoTableName:
-        !Ref 'myDynamoDBTable'
-
 Outputs:
   LambdaFnARN:
     Description: ARN of the Lambda Function created using CloudFormation Template
