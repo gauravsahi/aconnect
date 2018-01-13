@@ -53,18 +53,6 @@ Resources:
         - Arn
     Type: Custom::InitFunction
     Version: '1.0'
-  LambdaInvokePermission:
-    DependsOn: HelloWorld
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName:
-        Ref: HelloWorld
-      Principal: connect.amazonaws.com
-      SourceAccount:
-        Ref: AWS::AccountId
-      SourceArn:
-        Ref: Connectarn
-    Type: AWS::Lambda::Permission
   myDynamoDBTable:
     Properties:
       AttributeDefinitions:
