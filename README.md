@@ -53,9 +53,7 @@ The Lambda function response should be a simple Map string string. This map can 
 In this example, the lambda function will return 4 values CalledNumber, FirstName, LastName and LastCalledDate
 
 Dynamo DB:
-In this example, CloudFormation will deploy a DynamoDB table with name 'ConnectCC' with unique primary attribute key name 'CalledNumber'.
-The Cloud formation template uses a custom resource (InitFunction with naming schema like ‘<stack>-InitFunction-<random Alpha key>’) to pre-populate 
-the Dynamo DB table (Connect-CC) with a sample entry which will be retrieved & used in the contact flow.
+In this example, CloudFormation will deploy a DynamoDB table with name 'AConnect-CC' with unique primary attribute key name 'CalledNumber'. The Cloud formation template uses a custom resource (InitFunction with naming schema like ‘<stack>-InitFunction-<random Alpha key>’) to pre-populate the Dynamo DB table (AConnect-CC) with a sample entry which will be retrieved & used in the contact flow.
 Attribute Keys: CalledNumber, FirstName, LastName and LastCallDate [Minimum set]
 Attribute Key Values (example): 101, James, Bond, <Today’s Date>
 
