@@ -1,5 +1,5 @@
-Welcome to Amazon Connect with Serverless Hook
-==============================================
+Welcome to Amazon Connect Serverless Hook for Contextual Messages
+=================================================================
 
 The sample code helps get you started with a simple web service integration hook deployed by AWS CloudFormation between Amazon Connect and AWS Lambda with Dynamo DB.
 
