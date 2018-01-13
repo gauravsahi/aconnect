@@ -45,16 +45,6 @@ Resources:
         - DynamoDBReadPolicy:
             TableName: !Ref 'myDynamoDBTable'
 
-  LambdaInvokePermission:
-    Type: 'AWS::Lambda::Permission'
-    DependsOn: 'HelloWorld'
-    Properties:
-      FunctionName: !Ref 'HelloWorld'
-      Action: 'lambda:InvokeFunction'
-      Principal: connect.amazonaws.com
-      SourceAccount: !Ref 'AWS::AccountId'
-      SourceArn: !Ref 'Connectarn'
-
   InitFunction:
     Type: AWS::Serverless::Function
     Properties:
