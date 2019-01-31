@@ -23,11 +23,17 @@ Execute the following command on command prompt / terminal after navigating to t
 Open AWS Web Console for Cloud Formation, click on Create Stack and select the Serverless.yml, enter stack name and provide Amazon Connect Instance ARN to deploy the package
 Use AWS CLI to create a resource permission policy for HelloWorld lambda function to allow the invokation from Amazon Connect
 Manually populate the DynamoDB table with one sample row: Attribute Key Values (example): 101, James, Bond, <Today’s Date>
-Lambda Functions: In this example, Cloud Formation template creates a stack with 2 lambda functions
 
-HelloWorld with naming schema like ‘-HelloWorld-’ is the main function which does data dip and returns key value pairs to Amazon Connect
-InitFunction with naming schema like ‘-InitFunction-’ is only a initialisation function to pre-populate the Dynamo DB table
-Lambda Function Invocation from IVR: Amazon Connect can successfully invoke a Lambda function in an AWS account when a resource policy has been set on the Lambda function. It is done using the AWS CLI command line tools to create a resource policy which can be viewed in the AWS Management Console. For more information, see Using Resource-Based Policies for AWS Lambda (Lambda Function Policies). Structure: • The ARN of a Amazon Connect instance (for example, arn:aws:connect:useast-1:123456789012:instance/def1a4fc-ac9d-11e6-b582-example) • The AWS account ID for the Lambda function (for example, 123456789012) • The name of the Lambda function
+Lambda Functions: In this example, Cloud Formation template creates a stack with 2 lambda functions
+- MainFunction with naming schema like ‘-MainFunction-’ is the main function which does data dip and returns key value pairs to Amazon Connect
+- InitFunction with naming schema like ‘-InitFunction-’ is only a initialisation function to pre-populate the DynamoDB table
+
+Lambda Function Invocation from IVR: Amazon Connect can successfully invoke a Lambda function in an AWS account when a resource policy has been set on the Lambda function. It is done using the AWS CLI command line tools to create a resource policy which can be viewed in the AWS Management Console. For more information, see Using Resource-Based Policies for AWS Lambda (Lambda Function Policies). 
+
+Structure: 
+• The ARN of a Amazon Connect instance (for example, arn:aws:connect:useast-1:123456789012:instance/def1a4fc-ac9d-11e6-b582-example) 
+• The AWS account ID for the Lambda function (for example, 123456789012) 
+• The name of the Lambda function
 
 To create a resource permission policy using this information. Use the following command: aws lambda add-permission --function-name function: 
 --statement-id 1 --principal connect.amazonaws.com --action lambda:InvokeFunction 
