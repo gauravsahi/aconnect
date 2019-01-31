@@ -1,0 +1,148 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Description: Contextual Message (Master Template) for Amazon Connect
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: Amazon Connect configuration
+      Parameters:
+      - AmazonConnectInstance
+    - Label:
+        default: AWS S3 configuration
+      Parameters:
+      - S3BucketName
+      - S3KeyPrefix
+    ParameterLabels:
+      AmazonConnectInstance:
+        default: Amazon Connect Instance ARN
+      S3BucketName:
+        default: S3 Bucket Name
+      S3KeyPrefix:
+        default: S3 Key Prefix
+
+Parameters:
+  AmazonConnectInstance:
+    AllowedPattern: arn:aws:connect:us-east-1:.*
+    ConstraintDescription: To find the ARN for your instance, open the Amazon Connect
+      console, and then choose the Instance Alias to open the Overview page.
+    Description: ARN of the Amazon Connect instance that will trigger Lambda Function.
+      To find the ARN for your instance, open the Amazon Connect console, and then
+      choose the Instance Alias to open the Overview page.
+    Type: String
+  S3BucketName:
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-)
+    Description: S3 bucket name for the Quick Start assets. This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-)
+    Default: store4lambdafunction
+    Type: String
+  S3KeyPrefix:
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
+      uppercase letters, hyphens (-), and forward slash (/)
+    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
+      can include numbers, lowercase letters, uppercase letters, hyphens (-), and
+      forward slash (/)
+    Type: String
+    Default: connect-contextual-msg/functions/packages
+
+Rules:
+  RegionSupport:
+    Assertions:
+    - Assert:
+        Fn::Equals:
+        - Ref: AWS::Region
+        - us-east-1
+      AssertDescription: Region must be US East (N. Virginia) - us-east-1
+
+Resources:
+  ContextualMessageTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: CalledNumber
+          AttributeType: S
+      KeySchema:
+        - AttributeName: CalledNumber
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  ContextualMessageGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      Description: Amazon Connect Contextual Message Get Customer Date
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          tablename:
+            Ref: ContextualMessageTable
+      CodeUri: 
+        Bucket: !Ref S3BucketName
+        Key: 
+          !Join 
+            - '/'
+            - - !Ref S3KeyPrefix
+              - 'lambda_code.zip'
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref 'ContextualMessageTable'
+
+  LambdaInvokePermission:
+    Type: 'AWS::Lambda::Permission'
+    DependsOn: 'ContextualMessageGetFunction'
+    Properties:
+      FunctionName: !Ref 'ContextualMessageGetFunction'
+      Action: 'lambda:InvokeFunction'
+      Principal: connect.amazonaws.com
+      SourceAccount: !Ref 'AWS::AccountId'
+      SourceArn: !Ref 'AmazonConnectInstance'
+
+  InitFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      Description: Amazon Connect Contextual Message Insert Customer Data
+      MemorySize: 128
+      Timeout: 30
+      CodeUri: 
+        Bucket: !Ref S3BucketName
+        Key: 
+          !Join 
+            - '/'
+            - - !Ref S3KeyPrefix
+              - 'populatelambda.zip'
+      Timeout: 30
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref 'ContextualMessageTable'
+
+  InitializeDynamoDB:
+    Type: Custom::InitFunction
+    DependsOn: ContextualMessageTable
+    Version: "1.0"
+    Properties:
+      ServiceToken:
+        !GetAtt 'InitFunction.Arn'
+      DynamoTableName:
+        !Ref 'ContextualMessageTable'
+
+Outputs:
+  LambdaFnARN:
+    Description: ARN of the Lambda Function created using CloudFormation Template
+    Value: !GetAtt 'ContextualMessageGetFunction.Arn'
+...
